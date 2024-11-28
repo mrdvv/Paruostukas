@@ -13,7 +13,7 @@ const CreateProduct = () => {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const { setProducts } = useStore((state) => state.products);
+  const { fetchProducts } = useStore((state) => state.products); // Use the fetchProducts function
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,22 +24,22 @@ const CreateProduct = () => {
     e.preventDefault();
     setError('');
     setSuccess(false);
-  
+
     // Validate input
     if (!formData.name || !formData.price || !formData.image) {
       setError('All fields are required');
       return;
     }
-  
+
     try {
       const token = localStorage.getItem('token'); // Get token from localStorage
       if (!token) {
         setError('You are not authorized to perform this action');
         return;
       }
-  
+
       // API call to create a product with Authorization header
-      const response = await axios.post(
+      await axios.post(
         'http://localhost:8000/api/products',
         formData,
         {
@@ -48,11 +48,10 @@ const CreateProduct = () => {
           },
         }
       );
-  
-      // Update Zustand store after successful API call
-      const newProduct = response.data;
-      setProducts((prevProducts) => [...prevProducts, newProduct]);
-  
+
+      // Fetch updated product list from the server
+      await fetchProducts();
+
       setSuccess(true);
     } catch (err) {
       console.error(err);
@@ -109,15 +108,15 @@ const CreateProduct = () => {
           margin="normal"
         />
         <TextField
-        name="description"
-        label="Description"
-        value={formData.description}
-         onChange={handleChange}
-        fullWidth
-        required
-        margin="normal"
-        multiline // Allow multiline input for longer descriptions
-        rows={3} // Set the number of visible rows
+          name="description"
+          label="Description"
+          value={formData.description}
+          onChange={handleChange}
+          fullWidth
+          required
+          margin="normal"
+          multiline
+          rows={3}
         />
         <Button
           type="submit"
