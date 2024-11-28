@@ -13,7 +13,8 @@ const orderSchema = new Schema({
             }
         }
     ],
-    totalPrice: {type: Number, default: 0}
+    totalPrice: {type: Number, default: 0},
+    shippingAddress: { type: Schema.Types.ObjectId, ref: 'ShippingAddress', required: true },
 }, {timestamps: true});
 
 export default mongoose.model("Order", orderSchema);

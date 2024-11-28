@@ -22,6 +22,7 @@ const productSchema = new Schema({
         type: String,
         required: true
     },
+    ratedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 }, {timestamps: true});
 
 export default mongoose.model('Product', productSchema);

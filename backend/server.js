@@ -5,7 +5,9 @@ import mongoose from 'mongoose'
 import cookieParser from 'cookie-parser'
 
 import authRoutes from './routes/authRoutes.js'
-
+import productRoutes from './routes/productRoutes.js'
+import cartRoutes from './routes/cartRoutes.js'
+import checkoutRoutes from './routes/checkoutRoutes.js'
 
 dotenv.config()
 
@@ -28,7 +30,9 @@ app.use(express.urlencoded({ extended: false }));
 //routes
 
 app.use('/api', authRoutes);
-
+app.use('/api/', productRoutes);
+app.use('/api/', cartRoutes);
+app.use('/api/', checkoutRoutes);
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
