@@ -124,9 +124,6 @@ const ProductCard = ({ product }) => {
                 {isRated ? 'Unrate' : 'Rate'}
               </Button>
             )}
-            <Button variant="contained" color="secondary" onClick={handleAddToCart}>
-              Add to Cart
-            </Button>
             {isAdmin && (
               <>
                 <Button

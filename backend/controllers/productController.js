@@ -1,16 +1,13 @@
 import Product from '../models/product.js'
-import mongoose from 'mongoose';
+import Category from '../models/category.js'
 export const createProduct = async (req, res) => {
     try {
       const { name, price, image, description, category } = req.body;
-      if (!mongoose.Types.ObjectId.isValid(category)) {
-        return res.status(400).json({ success: false, message: 'Invalid category ID' });
-      }
       
       if (!name || !price || !image || !description || !category) {
         return res.status(400).json({ success: false, message: 'All fields are required' });
       }
-  
+      
       const categoryExists = await Category.findById(category);
       if (!categoryExists) {
         return res.status(400).json({ success: false, message: 'Category not found' });
