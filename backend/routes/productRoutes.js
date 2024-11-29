@@ -6,6 +6,8 @@ import {
   deleteProduct,
   updateProduct,
   toggleRating,
+  GetRatedProducts,
+  searchProducts
 } from '../controllers/productController.js';
 import { isAdmin } from '../helpers/auth.js';
 import { isAuthenticated } from '../helpers/auth.js'; // Import isAuthenticated middleware
@@ -16,16 +18,16 @@ const router = express.Router();
 router.get('/products', getAllProducts);
 
 // Create a new product
-router.post('/products', isAdmin, async (req, res) => {
-  const { name, price, image, rating, description } = req.body;
+router.post('/products', async (req, res) => {
+  const { name, price, image, rating, description, category } = req.body;
 
   // Validate input
-  if (!name || !price || !image || !description) {
+  if (!name || !price || !image || !description || !category) {
     return res.status(400).json({ message: 'All fields are required.' });
   }
 
   try {
-    const product = new Product({ name, price, image, rating, description });
+    const product = new Product({ name, price, image, rating, description, category });
     await product.save();
     res.status(201).json(product);
   } catch (err) {
@@ -34,13 +36,12 @@ router.post('/products', isAdmin, async (req, res) => {
   }
 });
 
-// Update a product
 router.put('/products/:id', isAdmin, updateProduct);
 
-// Delete a product by ID
 router.delete('/products/:id', isAdmin, deleteProduct);
 
-// Increment product rating (require authentication)
-router.put('/products/:id/rating', isAuthenticated, toggleRating); // Added isAuthenticated middleware
+router.put('/products/:id/rating', isAuthenticated, toggleRating);
 
+router.get('/products/rated', isAuthenticated, GetRatedProducts)
+router.get('/products/search', searchProducts)
 export default router;

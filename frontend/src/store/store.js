@@ -3,7 +3,7 @@ import decodeJWT from '../utils/jwt';
 import axios from 'axios';
 
 const useStore = create((set, get) => ({
-  // ------------------- AUTH STATE -------------------
+  // AUTH STATE
   auth: {
     isLoggedIn: !!localStorage.getItem('token'),
     token: localStorage.getItem('token') || null,
@@ -29,14 +29,12 @@ const useStore = create((set, get) => ({
           },
         });
       
-        // Fetch updated data after login
         const { fetchCart } = get().cart;
         const { fetchProducts } = get().products;
       
         await Promise.all([
-          fetchCart(),       // Fetch the updated cart
-          fetchProducts(),   // Fetch the updated products
-          // Optionally, fetch other data like orders
+          fetchCart(),
+          fetchProducts(),
         ]);
       },
     logout: () => {
@@ -51,7 +49,7 @@ const useStore = create((set, get) => ({
     },
   },
 
-  // ------------------- CART STATE -------------------
+  // CART STATE 
   cart: {
     items: [],
     fetchCart: async () => {
@@ -59,8 +57,6 @@ const useStore = create((set, get) => ({
             const response = await axios.get('http://localhost:8000/api/cart', {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
             });
-    
-            console.log('Cart Fetch Response:', response.data); // Debug API response
             set((state) => ({
                 cart: { ...state.cart, items: response.data.data || [] },
             }));
@@ -138,7 +134,7 @@ const useStore = create((set, get) => ({
     },
   },
 
-  // ------------------- CHECKOUT STATE -------------------
+  // CHECKOUT STATE
   checkout: {
     order: null,
     isCheckingOut: false,
@@ -152,8 +148,6 @@ const useStore = create((set, get) => ({
         set((state) => ({
           checkout: { ...state.checkout, order: response.data.data },
         }));
-
-        // Clear the cart after checkout
         get().cart.clearCart();
         return response.data.data;
       } catch (error) {
@@ -163,7 +157,7 @@ const useStore = create((set, get) => ({
     },
   },
 
-  // ------------------- PRODUCT STATE -------------------
+  // PRODUCT STATE
   products: {
     list: [],
     fetchProducts: async () => {
@@ -176,9 +170,9 @@ const useStore = create((set, get) => ({
         console.error('Error fetching products:', error);
       }
     },
-    createProduct: async (newProduct) => {
+    createProduct: async (formData) => {
       try {
-        const response = await axios.post('http://localhost:8000/api/products', newProduct, {
+        const response = await axios.post('http://localhost:8000/api/products', formData, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
         set((state) => ({
@@ -226,7 +220,7 @@ const useStore = create((set, get) => ({
         try {
           const response = await axios.put(
             `http://localhost:8000/api/products/${productID}/rating`,
-            {}, // No body required since `isAuthenticated` middleware handles the user
+            {},
             { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
           );
           set((state) => ({
@@ -242,9 +236,53 @@ const useStore = create((set, get) => ({
           console.error('Error toggling rating:', error.message);
           return { success: false, message: 'Error toggling rating' };
         }
+      },
+    fetchFilteredProducts: async (search, category) => {
+      try {
+        const response = await axios.get ('http://localhost:8000/api/products/search', {params: {search, category},});
+        set((state) => ({
+          products: { ...state.products, list: response.data.data },
+        }));
+      } catch (error) {
+        console.error('Error fetching filtered products:', error.message)
+      }
+    }
+    },
+// CATEGORY STATE
+  categories: {
+    list: [],
+    fetchCategories: async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/categories', {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}`}
+        });
+        set((state) => ({
+          categories: {
+            ...state.categories,
+            list: response.data.data 
+          }
+        }));
+      } catch (error) {
+        console.error("Error fething categories:", error.message);
       }
     },
-      
+  createCategory: async (categoryName) => {
+    try {
+      const response = await axios.post('http://localhost:8000/api/categories', 
+        {name: categoryName},
+        {headers: { Authorization: `Bearer ${localStorage.getItem("token")}`}
+      });
+      set((state) => ({
+        categories: {
+          ...state.categories,
+          list: [...state.categories.list, response.data.data] 
+        }
+      }))
+    } catch (error) {
+      console.error("error creating category:", error.message);
+    }
+  }
+  }
 }));
 
 export default useStore;

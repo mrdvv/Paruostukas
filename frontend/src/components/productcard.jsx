@@ -27,30 +27,28 @@ const ProductCard = ({ product }) => {
     price: product.price,
     image: product.image,
     description: product.description,
-  }); // State for edit form data
+    category: product.category,
+  }); 
 
-  // Sync the `isRated` state with the product rating status
   useEffect(() => {
     const ratedProducts = JSON.parse(localStorage.getItem('ratedProducts')) || {};
     setIsRated(!!ratedProducts[product._id]);
-  }, [product._id]); // Runs when the component mounts or `product._id` changes
+  }, [product._id]);
 
   const handleToggleRating = async () => {
     try {
-      const increment = !isRated; // Determine if we're adding or removing a rating
+      const increment = !isRated;
       const success = await toggleRating(product._id, increment);
 
       if (success) {
-        // Update local storage for rated products
+
         const ratedProducts = JSON.parse(localStorage.getItem('ratedProducts')) || {};
         if (isRated) {
-          delete ratedProducts[product._id]; // Remove the product from rated products
+          delete ratedProducts[product._id];
         } else {
-          ratedProducts[product._id] = true; // Add the product to rated products
+          ratedProducts[product._id] = true;
         }
         localStorage.setItem('ratedProducts', JSON.stringify(ratedProducts));
-
-        // Update local state to reflect the toggle
         setIsRated(!isRated);
       }
     } catch (error) {
@@ -67,7 +65,7 @@ const ProductCard = ({ product }) => {
       const success = await updateProduct(product._id, formData);
       if (success) {
         setEditOpen(false);
-        await fetchProducts(); // Refresh product list from the backend
+        await fetchProducts(); 
       }
     } catch (error) {
       console.error('Error editing product:', error);
@@ -79,7 +77,7 @@ const ProductCard = ({ product }) => {
       const success = await deleteProduct(product._id);
       if (success) {
         setDeleteOpen(false);
-        await fetchProducts(); // Refresh product list from the backend
+        await fetchProducts();
       }
     } catch (error) {
       console.error('Error deleting product:', error);
@@ -112,6 +110,9 @@ const ProductCard = ({ product }) => {
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {product.description}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+          Category: {product.category?.name || 'Unknown'}
           </Typography>
           <Box mt={2} display="flex" flexDirection="column" gap={1}>
             {isLoggedIn && (

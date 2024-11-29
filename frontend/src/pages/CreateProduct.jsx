@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Box, Button, TextField, Typography, Alert } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Button, TextField, Typography, Alert, MenuItem, FormControl, InputLabel, Select } from '@mui/material';
 import axios from 'axios';
-import useStore from '../store/store.js'; // Zustand store for products
+import useStore from '../store/store.js';
 
 const CreateProduct = () => {
   const [formData, setFormData] = useState({
@@ -10,10 +10,16 @@ const CreateProduct = () => {
     image: '',
     description: '',
     rating: 0,
+    category: "",
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const { fetchProducts } = useStore((state) => state.products); // Use the fetchProducts function
+  const {list: categories, fetchCategories} = useStore((state) => state.categories);
+  const { fetchProducts, createProduct } = useStore((state) => state.products);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,38 +31,21 @@ const CreateProduct = () => {
     setError('');
     setSuccess(false);
 
-    // Validate input
-    if (!formData.name || !formData.price || !formData.image) {
+    if (!formData.name || !formData.price || !formData.image || !formData.category) {
       setError('All fields are required');
       return;
     }
+    console.log('FormData:', formData);
+    console.log('Sending product data:', formData);
 
     try {
-      const token = localStorage.getItem('token'); // Get token from localStorage
-      if (!token) {
-        setError('You are not authorized to perform this action');
-        return;
-      }
-
-      // API call to create a product with Authorization header
-      await axios.post(
-        'http://localhost:8000/api/products',
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Include the token in the request
-          },
-        }
-      );
-
-      // Fetch updated product list from the server
-      await fetchProducts();
-
+      await createProduct(formData);
       setSuccess(true);
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.message || 'Failed to create product');
+      setError("Failed to create product");
     }
+
   };
 
   return (
@@ -118,6 +107,20 @@ const CreateProduct = () => {
           multiline
           rows={3}
         />
+        <FormControl fullWidth required margin="normal">
+          <InputLabel>Category</InputLabel>
+          <Select
+          name="category"
+          value={formData.category}
+          onChange={handleChange}
+          >
+            {categories.map((category) => (
+              <MenuItem key={category._id} value={category.name}>
+                {category.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         <Button
           type="submit"
           variant="contained"

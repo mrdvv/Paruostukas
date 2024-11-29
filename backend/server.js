@@ -8,7 +8,7 @@ import authRoutes from './routes/authRoutes.js'
 import productRoutes from './routes/productRoutes.js'
 import cartRoutes from './routes/cartRoutes.js'
 import checkoutRoutes from './routes/checkoutRoutes.js'
-
+import categoryRoutes from './routes/categoryRoutes.js'
 dotenv.config()
 
 const port = 8000;
@@ -33,6 +33,7 @@ app.use('/api', authRoutes);
 app.use('/api/', productRoutes);
 app.use('/api/', cartRoutes);
 app.use('/api/', checkoutRoutes);
+app.use('/api/', categoryRoutes);
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);

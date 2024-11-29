@@ -16,7 +16,7 @@ const Navbar = () => {
     <AppBar position="static">
       <Toolbar>
         <Button color='inherit' href="/">
-          My App
+          Ads
         </Button>
         <Box>
         <Button color="inherit" href="/cart">
@@ -25,11 +25,21 @@ const Navbar = () => {
           <Button color="inherit" href="/orders">
             Orders
           </Button>
-          {isAdmin && (
+          <Button color="inherit" href="/rated-products">
+            rated Ads
+          </Button>          
           <Button color="inherit" href="/create-product">
-            create product
+            Create Ad
           </Button>
+          <Button color="inherit" href="/search">
+            Search
+          </Button>
+          {isAdmin && (
+                      <Button color="inherit" href="/admin">
+                        Admin
+                    </Button>
           )}
+
           {isLoggedIn ? (
             <Button color="inherit" onClick={handleLogout}>
               Logout

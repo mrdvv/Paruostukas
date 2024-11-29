@@ -14,7 +14,7 @@ const ProductList = () => {
   return (
     <Box sx={{ padding: 4 }}>
       <Typography variant="h4" gutterBottom>
-        Our Products
+        Our Ads
       </Typography>
       <Box display="flex" flexWrap="wrap" justifyContent="center" gap={2}>
         {products.length > 0 ? (
